@@ -28,7 +28,7 @@ This is a [Next.js](https://nextjs.org) web application originally developed for
 ### Server Side
 <ul>
     <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
-    <li><a href="https://nestjs.com/">Nest.js</a></li>
+    <li><a href="https://nextjs.org/">Next.js</a></li>
 </ul>
 
 ### Database
