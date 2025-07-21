@@ -22,6 +22,9 @@ git clone
 ```
 
 ### 2. Move to the directory of the project
+```
+cd reservation_webapp
+```
 
 ### 3. Install dependencies
 Install the dependencies required for the project:
@@ -32,12 +35,12 @@ npm i
 ### 4. Create an `.env` file
 Create an `.env` file to store the following variables:
 ```
-MONGODB_URI="mongodb://127.0.0.1:27017/lll"
-AUTH_SECRET='ABCD' # Added by `npx auth`. Read more: https://cli.authjs.dev
-AUTH_GOOGLE_ID=''
-AUTH_GOOGLE_SECRET=''
+MONGODB_URI="mongodb://127.0.0.1:27017/MONGODB_DATABASE_NAME" # MONGODB_DATABASE_NAME is your Mongodb database name.
+AUTH_SECRET='YOUR_SECRET' # Added by `npx auth`. Read more: https://cli.authjs.dev The Secret should be HARD to guess.
+AUTH_GOOGLE_ID='GOOGLE_OAUTH_CLIENT_ID'   # This is an OAuth 2.0 client id you get from Google. Read more: https://developers.google.com/identity/protocols/oauth2
+AUTH_GOOGLE_SECRET='GOOGLE_OAUTH_CLIENT_SECRET' # This is an OAuth 2.0 client secret you get from Google. Read more: https://developers.google.com/identity/protocols/oauth2
 AUTH_TRUST_HOST=true
-AUTHJS_SECRET_1=''
+AUTHJS_SECRET_1='' # This is a random string (i.e., secret) used to hash tokens, sign cookies and generate cryptographic keys. Read more: https://authjs.dev/reference/core#secret
 AUTH_URL="http://localhost:3000"
 ```
 
@@ -46,31 +49,12 @@ To run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-## Get Started
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 6. Register a User
+After visiting the webpage, register a new user. By default, the new user will have 'user' as a role. This means it is a normal user, not an admin. To change the role to admin, change the role field of the user document in the database to admin.
+The user now can visit [Admin Page](http://localhost:3000/admin) without any problem.
 
 ## Learn More
 
@@ -79,13 +63,10 @@ To learn more about Next.js, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 # Credits
 - **[kbits000](https://github.com/kbits000)** - Project development and code implementation.
