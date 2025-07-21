@@ -12,9 +12,6 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(isSameOrAfter);
 
 
-import {getAllAvailableReservationsServerAction} from "@/lib/actions/server_actions";
-
-
 export default function AnonymousUserReservationPage() {
     const screens = useBreakpoint();
     const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs());
@@ -22,11 +19,7 @@ export default function AnonymousUserReservationPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        async function fetchOpenReservations() {
-            const afd = await getAllAvailableReservationsServerAction();
-        }
 
-        fetchOpenReservations();
     }, [screens]);
 
     const incrementModalClickCounter = () => {

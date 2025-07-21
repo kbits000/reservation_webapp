@@ -11,14 +11,13 @@ const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
 const { Panel } = Splitter;
 const { Item } = List;
-import { getAllAvailableReservationsServerAction } from "@/lib/actions/server_actions";
 import { ReservationTimeSlotsForDateList } from '@/components/ui/main_pages/reservation_page/reservation_time_slots_for_date_list';
 
 
 
 export function UserReservePage() {
     const screens = useBreakpoint();
-    const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs());
+    const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0));
     const [modalClickCounter, setModalClickCounter] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
     const [showTimeSlotsPanel, setShowTimeSlotsPanel] = useState(false);
@@ -26,11 +25,7 @@ export function UserReservePage() {
     const [modalLoading, setModalLoading] = useState(true);
 
     useEffect(() => {
-        async function fetchOpenReservations() {
-            // const afd = await getAllAvailableReservationsServerAction();
-        }
 
-        fetchOpenReservations();
     }, [screens]);
 
     const incrementPanelClickCounter = () => {
@@ -110,7 +105,7 @@ export function UserReservePage() {
                                     {/*<p>Some contents...</p>*/}
                                     {/*<p>Some contents...</p>*/}
                                     {/*<p>Some contents...</p>*/}
-                                    <ReservationTimeSlotsForDateList dateInISO8601Format={'fdsf'}/>
+                                    <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()}/>
                                 </Modal>
                                 <Calendar value={calenderValue} disabledDate={disabledDate} onSelect={handleOnSelectCalenderDate} />
                             </>
@@ -153,7 +148,7 @@ export function UserReservePage() {
                                                 {/*        <Button>من 10 إلى 11</Button>*/}
                                                 {/*    </Item>*/}
                                                 {/*</List>*/}
-                                                <ReservationTimeSlotsForDateList dateInISO8601Format={'fddsf'}/>
+                                                <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()}/>
                                             </Panel>
                                         </>
                                     }

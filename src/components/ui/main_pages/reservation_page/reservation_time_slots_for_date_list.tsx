@@ -18,11 +18,9 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format}: { dateInI
         // generate list items of time slots
         async function fetchAllAvailableTimeSlotsForDate() {
             try {
-                console.log("fetchAllAvailableTimeSlotsForDate");
-                const atwet = await getAllAvailableTimeSlotsForDateServerAction('dateInISO8601Format');
-                console.log(atwet);
+                const allTimeSlots = await getAllAvailableTimeSlotsForDateServerAction(dateInISO8601Format);
 
-                setTimeSlotsForDate(atwet);
+                setTimeSlotsForDate(allTimeSlots);
             } catch {
                 setTimeSlotsForDate(null);
             }
@@ -39,7 +37,7 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format}: { dateInI
                 bordered
                 dataSource={timeSlotsForDate || undefined}
                 renderItem={(item) => (
-                    <Item><Button>{item.start_time} end {item.end_time}</Button></Item>
+                    <Item><Button>{item.start_time} إلى {item.end_time}</Button></Item>
                 )}
             />
         </>

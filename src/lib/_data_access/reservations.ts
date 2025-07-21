@@ -13,24 +13,82 @@ export async function addReservations() {
     }
 }
 
-export async function getReservationsForDate(dateInISO8601Format: string) {
+export async function getPendingReservationsForSpecificDate(dateInISO8601Format: string) {
     try {
-        await dbConnect();
-        const reservations = await ReservationsModel.find({date: dateInISO8601Format, status: 'open'}).lean();  // TODO check if date is in ISO8601 format
+        // check if string is in ISO 8601 format
+        const dateObj = new Date(dateInISO8601Format);
+        if (!isNaN(dateObj.getTime()) && dateInISO8601Format === dateObj.toISOString()) {
+        } else {
+            return null;
+        }
 
-        const reservationsDTOList = [];
+        await dbConnect();
+
+        // Pending Reservations
+        const pendingReservations = await ReservationsModel.find({date: dateObj, status: 'pending'}).lean();
+        const pendingReservationsDTOList = [];
         let id = 0;
-        for (const reservation of reservations) {
+        for (const reservation of pendingReservations) {
             const reservationDTO = {
                 key: id,
                 date: reservation['date'],
                 start_time: reservation['start_time'],
                 end_time: reservation['end_time']
             }
-            reservationsDTOList.push(reservationDTO);
+            pendingReservationsDTOList.push(reservationDTO);
             id++;
         }
-        return reservationsDTOList;
+
+        return pendingReservationsDTOList;
+    } catch {
+        return null;
+    }
+}
+
+export async function getPendingOrConfirmedReservationsForSpecificDate(dateInISO8601Format: string) {
+    try {
+        // check if string is in ISO 8601 format
+        const dateObj = new Date(dateInISO8601Format);
+        if (!isNaN(dateObj.getTime()) && dateInISO8601Format === dateObj.toISOString()) {
+        } else {
+            return null;
+        }
+
+        await dbConnect();
+
+        // Pending Reservations
+        const pendingReservations = await ReservationsModel.find({date: dateObj, status: 'pending'}).lean();
+        const pendingReservationsDTOList = [];
+        let id = 0;
+        for (const reservation of pendingReservations) {
+            const reservationDTO = {
+                key: id,
+                date: reservation['date'],
+                start_time: reservation['start_time'],
+                end_time: reservation['end_time']
+            }
+            pendingReservationsDTOList.push(reservationDTO);
+            id++;
+        }
+
+        // Confirmed Reservations
+        const confirmedReservations = await ReservationsModel.find({date: dateObj, status: 'confirmed'}).lean();
+        const confirmedReservationsDTOList = [];
+        id = 0;
+        for (const reservation of confirmedReservations) {
+            const reservationDTO = {
+                key: id,
+                date: reservation['date'],
+                start_time: reservation['start_time'],
+                end_time: reservation['end_time']
+            }
+            confirmedReservationsDTOList.push(reservationDTO);
+            id++;
+        }
+
+        const pendingOrConfirmedReservationsDTOList = pendingReservationsDTOList.concat(confirmedReservationsDTOList);
+
+        return pendingOrConfirmedReservationsDTOList;
     } catch {
         return null;
     }
