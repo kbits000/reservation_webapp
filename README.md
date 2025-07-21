@@ -3,6 +3,39 @@
 ## Overview
 This is a [Next.js](https://nextjs.org) web application originally developed for a center that provides educational courses and the ability to reserve a room for general purpose. All copyright contents have been removed.
 
+[//]: # (<!-- Screenshots -->)
+
+[//]: # (## Screenshots)
+
+[//]: # ()
+[//]: # (<div style="align-content: center"> )
+
+[//]: # (  <img src="https://placehold.co/600x400?text=Your+Screenshot+here" alt="screenshot" />)
+
+[//]: # (</div>)
+
+<!-- TechStack -->
+##  Tech Stack
+### Client Side
+<ul>
+    <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
+    <li><a href="https://nextjs.org/">Next.js</a></li>
+    <li><a href="https://react.dev/">React</a></li>
+    <li><a href="https://tailwindcss.com/">TailwindCSS</a></li>
+    <li><a href="https://ant.design/">Ant Design</a></li>
+</ul>
+
+### Server Side
+<ul>
+    <li><a href="https://www.typescriptlang.org/">Typescript</a></li>
+    <li><a href="https://nestjs.com/">Nest.js</a></li>
+</ul>
+
+### Database
+<ul>
+    <li><a href="https://www.mongodb.com/">MongoDB</a></li>
+</ul>
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
