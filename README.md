@@ -1,5 +1,7 @@
 # Reservation Web App
 
+![Status](https://img.shields.io/badge/status-unfinished-red)
+
 ## Overview
 This is a [Next.js](https://nextjs.org) web application originally developed for a center that provides educational courses and the ability to reserve a room for general purpose. All copyright contents have been removed.
 
