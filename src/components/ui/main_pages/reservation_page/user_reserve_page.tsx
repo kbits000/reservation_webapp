@@ -1,23 +1,26 @@
 'use client'
-import {useEffect, useState} from "react";
 
-import locale from "antd/locale/ar_EG";
+import {useEffect, useState} from "react";
 import dayjs, {type Dayjs} from "dayjs";
-import { ConfigProvider } from "antd";
-import "dayjs/locale/ar-sa";
+import 'dayjs/locale/ar-sa' // import locale
+dayjs.locale('ar-sa') // use locale
+import utc from 'dayjs/plugin/utc' // import utc plugin
+import timezone from 'dayjs/plugin/timezone' // import timezone plugin
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Riyadh");
 import { CloseOutlined } from '@ant-design/icons';
-import { Button, Calendar, Grid, Modal, Typography, Splitter, Empty, List } from "antd";
+import { Button, Calendar, Grid, Modal, Typography, Splitter } from "antd";
 const { useBreakpoint } = Grid;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Panel } = Splitter;
-const { Item } = List;
 import { ReservationTimeSlotsForDateList } from '@/components/ui/main_pages/reservation_page/reservation_time_slots_for_date_list';
 
 
 
 export function UserReservePage() {
     const screens = useBreakpoint();
-    const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0));
+    const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).tz('Asia/Riyadh'));
     const [modalClickCounter, setModalClickCounter] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
     const [showTimeSlotsPanel, setShowTimeSlotsPanel] = useState(false);
@@ -37,27 +40,29 @@ export function UserReservePage() {
     }
 
     const handleOnSelectCalenderDate = (date: Dayjs) => {
+        console.log(date);
         if (!screens.lg) {
-            if (date.isSame(calenderValue)) {
-                if (modalClickCounter >= 1) {
-                    setModalClickCounter(0);
-                    showModal();
-                    return;
-                }
-                incrementModalClickCounter();
-                return;
-            }
+            // if (date.isSame(calenderValue)) {
+            //     if (modalClickCounter >= 1) {
+            //         setModalClickCounter(0);
+            //         showModal();
+            //         return;
+            //     }
+            //     incrementModalClickCounter();
+            //     return;
+            // }
             setCalenderValue(date);
+            showModal();
             setModalClickCounter(0);
         } else {
-            if (date.isSame(calenderValue)) {
-                if (panelClickCounter >= 1) {
-                    setPanelClickCounter(0);
-                    setShowTimeSlotsPanel(true);
-                    return;
-                }
-                incrementPanelClickCounter();
-            }
+            // if (date.isSame(calenderValue)) {
+            //     if (panelClickCounter >= 1) {
+            //         setPanelClickCounter(0);
+            //         setShowTimeSlotsPanel(true);
+            //         return;
+            //     }
+            //     incrementPanelClickCounter();
+            // }
             setCalenderValue(date);
             setShowTimeSlotsPanel(true);
         }

@@ -4,7 +4,14 @@ import {useEffect, useState} from "react";
 import { List, Button} from "antd";
 const { Item } = List;
 import {getAllAvailableTimeSlotsForDateServerAction} from '@/lib/actions/user_reservation_server_actions';
-
+import dayjs from "dayjs";
+import 'dayjs/locale/ar-sa' // import locale
+dayjs.locale('ar-sa') // use locale
+import utc from 'dayjs/plugin/utc' // import utc plugin
+import timezone from 'dayjs/plugin/timezone' // import timezone plugin
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Riyadh");
 
 interface TimeSlot {
     start_time: string;
@@ -19,7 +26,6 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format}: { dateInI
         async function fetchAllAvailableTimeSlotsForDate() {
             try {
                 const allTimeSlots = await getAllAvailableTimeSlotsForDateServerAction(dateInISO8601Format);
-
                 setTimeSlotsForDate(allTimeSlots);
             } catch {
                 setTimeSlotsForDate(null);
@@ -27,7 +33,7 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format}: { dateInI
         }
 
         fetchAllAvailableTimeSlotsForDate()
-    }, []);
+    }, [dateInISO8601Format]);
 
     return (
         <>
@@ -37,7 +43,11 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format}: { dateInI
                 bordered
                 dataSource={timeSlotsForDate || undefined}
                 renderItem={(item) => (
-                    <Item><Button>{item.start_time} إلى {item.end_time}</Button></Item>
+                    <Item><Button
+                        data-item-start-time={item.start_time}
+                        data-item-end-time={item.end_time}
+                        onClick={() => console.log()}
+                    >{(dayjs(item.start_time)).tz("Asia/Riyadh").format('h:mm a')} إلى {(dayjs(item.end_time)).tz("Asia/Riyadh").format('h:mm a')}</Button></Item>
                 )}
             />
         </>
