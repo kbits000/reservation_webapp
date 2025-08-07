@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { List, Button} from "antd";
 const { Item } = List;
 import {getAllAvailableTimeSlotsForDateServerAction} from '@/lib/actions/user_reservation_server_actions';
@@ -39,10 +39,11 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format, timeSlotCl
         fetchAllAvailableTimeSlotsForDate();
     }, [dateInISO8601Format]);
 
-    const handleTimeSlotClick = (e) => {
-        console.log('before working');
-        console.log('e is: ', e.target.parentNode.dataset.itemStartTime)
-        timeSlotClickFunctionAction(e.target.parentNode.dataset.itemStartTime, e.target.parentNode.dataset.itemEndTime);
+    const handleTimeSlotClick = (e: React.MouseEvent<HTMLElement>) => {
+        const parentNode = e.currentTarget.parentNode as HTMLElement;
+        const startTime = parentNode.dataset.itemStartTime;
+        const endTime = parentNode.dataset.itemEndTime;
+        timeSlotClickFunctionAction(startTime!, endTime!);
     }
 
     return (
