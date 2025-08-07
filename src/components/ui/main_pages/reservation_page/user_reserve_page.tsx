@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import { useEffect, useState, useRef } from "react";
 import dayjs, {type Dayjs} from "dayjs";
 import 'dayjs/locale/ar-sa' // import locale
 dayjs.locale('ar-sa') // use locale
@@ -10,15 +10,17 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Riyadh");
 import { CloseOutlined } from '@ant-design/icons';
-import { Button, Calendar, Grid, Modal, Typography, Splitter } from "antd";
+import { Button, Calendar, Grid, Modal, Typography, Splitter, Carousel, Space } from "antd";
 const { useBreakpoint } = Grid;
 const { Title } = Typography;
 const { Panel } = Splitter;
 import { ReservationTimeSlotsForDateList } from '@/components/ui/main_pages/reservation_page/reservation_time_slots_for_date_list';
+import { ReserverDetailsComponent } from "@/components/ui/main_pages/reservation_page/reserver_details_component";
+import type { GetRef } from 'antd';
 
 
-
-export function UserReservePage() {
+export function UserReservePage({userEmail, userName}: {userEmail: string | null | undefined; userName: string | null | undefined}) {
+    const carouselRef = useRef<GetRef<typeof Carousel>>(null);
     const screens = useBreakpoint();
     const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).tz('Asia/Riyadh'));
     const [modalClickCounter, setModalClickCounter] = useState(0);
@@ -26,10 +28,12 @@ export function UserReservePage() {
     const [showTimeSlotsPanel, setShowTimeSlotsPanel] = useState(false);
     const [panelClickCounter, setPanelClickCounter] = useState(0);
     const [modalLoading, setModalLoading] = useState(true);
+    const [showReserverDetails, setShowReserverDetails] = useState<boolean>(false);
+    const [selectedTimePeriod, setSelectedTimePeriod] = useState<[string,string]>(['','']);
 
     useEffect(() => {
 
-    }, [screens]);
+    }, [screens, showReserverDetails, selectedTimePeriod]);
 
     const incrementPanelClickCounter = () => {
         setPanelClickCounter(panelClickCounter + 1);
@@ -88,6 +92,24 @@ export function UserReservePage() {
         setShowTimeSlotsPanel(false);
     }
 
+    const handleTimeSlotClick = (selectedStartTime: string, selectedEndTime: string) => {
+        console.log('before showReserverDetails: ', showReserverDetails);
+        setShowReserverDetails(prevState => !prevState);
+        console.log('after showReserverDetails: ', showReserverDetails);
+        // carouselRef.current.next();
+        if (carouselRef.current) {
+            carouselRef.current.next();
+            if (selectedStartTime != null && selectedEndTime != null) {
+                setSelectedTimePeriod((prevState) => [selectedStartTime, selectedEndTime]);
+            }
+        }
+    }
+
+    const toggleGoBackButtonClick = () => {
+        setShowReserverDetails(prevState => !prevState);
+        console.log('go back button clicked');
+    }
+
     return (
         <>
             <div className="p-10 h-min">
@@ -107,10 +129,7 @@ export function UserReservePage() {
                                        onCancel={handleCancel}
                                        // loading={modalLoading}
                                 >
-                                    {/*<p>Some contents...</p>*/}
-                                    {/*<p>Some contents...</p>*/}
-                                    {/*<p>Some contents...</p>*/}
-                                    <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()}/>
+                                    <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()} timeSlotClickFunctionAction={handleTimeSlotClick} />
                                 </Modal>
                                 <Calendar value={calenderValue} disabledDate={disabledDate} onSelect={handleOnSelectCalenderDate} />
                             </>
@@ -121,43 +140,46 @@ export function UserReservePage() {
                         &&
                         (
                             <>
-                                <Splitter>
-                                    <Panel resizable={false}>
-                                        <Calendar value={calenderValue} disabledDate={disabledDate} onSelect={handleOnSelectCalenderDate} />
-                                    </Panel>
-                                    {
-                                        showTimeSlotsPanel &&
-                                        <>
-                                            <Panel resizable={false} className='p-8'>
-                                                <Button size={'small'} icon={<CloseOutlined />} onClick={handleOnClickCloseButton}/>
-                                                {/*<Empty*/}
-                                                {/*    description={*/}
-                                                {/*        <Text>*/}
-                                                {/*            لا يوجد اوقات متاحة*/}
-                                                {/*        </Text>*/}
-                                                {/*    }*/}
-                                                {/*/>*/}
-                                                {/*<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>*/}
-                                                {/*<List*/}
-                                                {/*    itemLayout="vertical"*/}
-                                                {/*    header={<div>الاوقات المتاحة:</div>}*/}
-                                                {/*    bordered*/}
-                                                {/*>*/}
-                                                {/*    <Item>*/}
-                                                {/*        <Text>this is me hahaha </Text>*/}
-                                                {/*    </Item>*/}
-                                                {/*    <Item>*/}
-                                                {/*        <Text>That is that</Text>*/}
-                                                {/*    </Item>*/}
-                                                {/*    <Item>*/}
-                                                {/*        <Button>من 10 إلى 11</Button>*/}
-                                                {/*    </Item>*/}
-                                                {/*</List>*/}
-                                                <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()}/>
+                                <Carousel ref={carouselRef} effect="fade">
+                                    <Space >
+                                        <Splitter>
+                                            <Panel resizable={false}>
+                                                <Calendar value={calenderValue} disabledDate={disabledDate} onSelect={handleOnSelectCalenderDate} />
                                             </Panel>
-                                        </>
+                                            {
+                                                showTimeSlotsPanel &&
+                                                <Panel resizable={false} className='p-8'>
+                                                    <Button size={'small'} icon={<CloseOutlined />} onClick={handleOnClickCloseButton}/>
+                                                    {/*<Empty*/}
+                                                    {/*    description={*/}
+                                                    {/*        <Text>*/}
+                                                    {/*            لا يوجد اوقات متاحة*/}
+                                                    {/*        </Text>*/}
+                                                    {/*    }*/}
+                                                    {/*/>*/}
+                                                    <ReservationTimeSlotsForDateList dateInISO8601Format={calenderValue.toISOString()}  timeSlotClickFunctionAction={handleTimeSlotClick}/>
+                                                </Panel>
+                                            }
+                                        </Splitter>
+                                    </Space>
+                                    {
+                                        showReserverDetails ? (
+                                            <div className='hidden'>
+                                                <ReserverDetailsComponent
+                                                    carouselRef={carouselRef.current}
+                                                    toggleGoBackButtonClick={toggleGoBackButtonClick}
+                                                    dateInH={calenderValue}
+                                                    userEmail={userEmail}
+                                                    userName={userName}
+                                                    reservationDateInISO8601={calenderValue}
+                                                    reservationTimePeriodInISO8601={selectedTimePeriod}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className='hidden'></div>
+                                        )
                                     }
-                                </Splitter>
+                                </Carousel>
                             </>
                         )
                     }

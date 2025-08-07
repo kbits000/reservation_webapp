@@ -459,14 +459,17 @@ export async function getAllAvailableTimeSlotsForDate(dateInISO8601Format: strin
         let start_hour = 8;
         // let end_hour =  23;
         const day_of_week = dateObj.getDay();
+        const year = dateObj.getFullYear();
+        const month = dateObj.getMonth();
+        const day_of_month = dateObj.getDate();
         // FROM SETTINGS --- END ---
 
         for (let step = 0; step < 15; step++) {
             // const start_time = new Date(2025, 8, 1, hours, 0, 0, 0);
             const start_time_temp: dayjs.Dayjs = dayjs()
-                .set('year', 2025)
-                .set('month', 7)
-                .set('date', 1)
+                .set('year', year)
+                .set('month', month)
+                .set('date', day_of_month)
                 .set('hour', start_hour)
                 .set('minute', 0)
                 .set('second', 0)
@@ -474,9 +477,9 @@ export async function getAllAvailableTimeSlotsForDate(dateInISO8601Format: strin
                 .tz(tz);
 
             const end_time_temp = dayjs()
-                .set('year', 2025)
-                .set('month', 7)
-                .set('date', 1)
+                .set('year', year)
+                .set('month', month)
+                .set('date', day_of_month)
                 .set('hour', start_hour+1)
                 .set('minute', 0)
                 .set('second', 0)

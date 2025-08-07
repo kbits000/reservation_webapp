@@ -22,7 +22,7 @@ export default async function Page() {
 
   return (
       <div className='p-10'>
-          <UserReservePage />
+          <UserReservePage userEmail={session.user?.email} userName={session.user?.name} />
       </div>
   )
 }
