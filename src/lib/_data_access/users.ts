@@ -147,7 +147,7 @@ export async function getUsers() {
       usersDataDTO.push({
         username: user.name,
         email: user.email,
-        phone_number: user.phoneNumber,
+        phone_number: user.phone_number,
         sex: userSexInArabic,
         role: userRoleInArabic,
         account_registration_date: account_creation_date
@@ -206,8 +206,49 @@ export async function getUserDataByEmail() {
     await dbConnect();
 
     const userData = await UsersModel.find({'email': session.user?.email}).lean();
-    console.log('userData by email: ', userData);
+    const userDataDTO = [];
+    userDataDTO.push({
+          'name': userData[0]['name'],
+          'email': userData[0]['email'],
+          'sex': userData[0]['sex'],
+          'phoneNumber': userData[0]['phone_number'],
+          'role': userData[0]['role'],
+          'profile_picture': userData[0]['profile_picture']
+      })
   } catch {
     return null;
   }
+}
+
+interface UserFullNameAndSexAndPhoneNumberDTO {
+    full_name: string;
+    sex: string;
+    phone_number: string;
+}
+
+export async function getUserFullNameAndSexAndPhoneNumber() {
+    const session = await auth();
+    if (!session) {
+        redirect('/api/auth/signin');
+    }
+
+    try {
+        await dbConnect();
+
+        const userData = await UsersModel.findOne({'email': session.user?.email}, 'name sex phone_number').lean();
+        if (!userData) {
+            return null;
+        }
+
+        const userDataDTO: UserFullNameAndSexAndPhoneNumberDTO[] = [];
+        userDataDTO.push({
+            'full_name': userData!['name'],
+            'sex': userData!['sex'],
+            'phone_number': userData!['phone_number']
+        });
+
+        return userDataDTO[0];
+    } catch {
+        return null;
+    }
 }

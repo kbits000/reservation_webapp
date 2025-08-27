@@ -19,8 +19,22 @@ import { ReserverDetailsComponent } from "@/components/ui/main_pages/reservation
 import type { GetRef } from 'antd';
 
 
-export function UserReservePage({userEmail, userName}: {userEmail: string | null | undefined; userName: string | null | undefined}) {
-    const carouselRef = useRef<GetRef<typeof Carousel>>(null);
+export function UserReservePage(
+    {
+        userEmail,
+        userName,
+        userPhoneNumber,
+        userSex,
+        userFullName
+    }:
+    {
+        userEmail: string | null | undefined;
+        userName: string | null | undefined
+        userPhoneNumber: string | null | undefined;
+        userSex: string | null | undefined;
+        userFullName: string | null | undefined;
+    }
+) {    const carouselRef = useRef<GetRef<typeof Carousel>>(null);
     const screens = useBreakpoint();
     const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).tz('Asia/Riyadh'));
     const [modalClickCounter, setModalClickCounter] = useState(0);
@@ -173,6 +187,9 @@ export function UserReservePage({userEmail, userName}: {userEmail: string | null
                                                     userName={userName}
                                                     reservationDateInISO8601={calenderValue}
                                                     reservationTimePeriodInISO8601={selectedTimePeriod}
+                                                    userPhoneNumber={userPhoneNumber}
+                                                    userSex={userSex}
+                                                    userFullName={userFullName}
                                                 />
                                             </div>
                                         ) : (

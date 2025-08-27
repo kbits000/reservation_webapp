@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Flex, Form, Input, Select, DatePicker, TimePicker } from 'antd';
+import { Button, Form, Input, Select, DatePicker, TimePicker } from 'antd';
 const {Option} = Select;
 const { Item } = Form;
 const { TextArea } = Input;
@@ -11,7 +11,7 @@ import dayjs, {type Dayjs} from "dayjs";
 import 'dayjs/locale/ar-sa' // import locale
 dayjs.locale('ar-sa') // use locale
 import utc from 'dayjs/plugin/utc' // import utc plugin
-import timezone from 'dayjs/plugin/timezone' // import timezone plugin
+import timezone from 'dayjs/plugin/timezone'
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Riyadh");
@@ -26,6 +26,9 @@ export function ReserverDetailsComponent(x: {
     // reservationStartTimeInISO8601: Dayjs;
     // reservationEndTimeInISO8601: Dayjs;
     reservationTimePeriodInISO8601: [string, string];
+    userPhoneNumber: string | null | undefined;
+    userSex: string | null | undefined;
+    userFullName: string | null | undefined;
 }) {
 
     const prefixSelector = (
@@ -35,6 +38,10 @@ export function ReserverDetailsComponent(x: {
             </Select>
         </Item>
     );
+
+    const onFinish = () => {
+        console.log('onFinish');
+    }
 
     return (
         <div dir='rtl'>
@@ -49,12 +56,17 @@ export function ReserverDetailsComponent(x: {
                 className='mb-4'
             >الرجوع للوراء</Button>
             <Form
-                initialValues={{
-                    username: x.userName,
-                    email: x.userEmail,
-                    gender: 'Male',     // TODO fetch it
-                    reservationDate: x.reservationDateInISO8601.tz('Asia/Riyadh'),
-                    reservationTimePeriod: [dayjs(x.reservationTimePeriodInISO8601[0]).tz('Asia/Riyadh'), dayjs(x.reservationTimePeriodInISO8601[1]).tz('Asia/Riyadh')]}}
+                initialValues={
+                    {
+                        username: x.userName,
+                        phone_number: x.userPhoneNumber,
+                        full_name: x.userFullName,
+                        email: x.userEmail,
+                        gender: x.userSex,
+                        reservationDate: x.reservationDateInISO8601.tz('Asia/Riyadh'),
+                        reservationTimePeriod: [dayjs(x.reservationTimePeriodInISO8601[0]).tz('Asia/Riyadh'), dayjs(x.reservationTimePeriodInISO8601[1]).tz('Asia/Riyadh')]
+                    }}
+                onFinish={onFinish}
             >
                 <Item
                     label="اسم المستخدم"
@@ -65,20 +77,20 @@ export function ReserverDetailsComponent(x: {
                 </Item>
                 <Item
                     label='الاسم كاملا'
-                    name='full-name'
+                    name='full_name'
                     rules={[{required: true, message: 'الرجاء كتابة اسمك كاملاً!'}]}
                 >
-                    <Input />
+                    <Input disabled={true} required={true}/>
                 </Item>
                 <Item name={'email'} label="البريد الالكتروني" rules={[{ required: true, type: 'email', message: 'الرجاء ادخال البريد الالكتروني!' }]}>
                     <Input disabled={true} required={true}/>
                 </Item>
                 <Item
-                    name="phone-number"
+                    name="phone_number"
                     label="رقم الهاتف"
-                    rules={[{ required: true, type: 'number', message: 'الرجاء ادخال رقم الهاتف!' }]}
+                    rules={[{ required: true, message: 'الرجاء ادخال رقم الهاتف!' }]}
                 >
-                    <Input addonAfter={prefixSelector} style={{ width: '100%' }} />
+                    <Input addonAfter={prefixSelector} style={{ width: '100%' }} disabled={true} required={true}/>
                 </Item>
                 <Item
                     name='gender'
@@ -107,12 +119,10 @@ export function ReserverDetailsComponent(x: {
                 <Item label='ملاحظات اضافية'>
                     <TextArea showCount={true}/>
                 </Item>
+                <Button type="primary" htmlType="submit">
+                    Submit
+                </Button>
             </Form>
-            <Flex >
-                <p>Name is:  john</p>
-                <p>Date is: {x.dateInH.tz('Asia/Riyadh').format('YY/MM/DD h:mm a')}</p>
-                <p>الايميل:</p>
-            </Flex>
         </div>
     )
 }

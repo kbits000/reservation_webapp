@@ -39,7 +39,7 @@ export function ReservationTimeSlotsForDateList({dateInISO8601Format, timeSlotCl
         fetchAllAvailableTimeSlotsForDate();
     }, [dateInISO8601Format]);
 
-    const handleTimeSlotClick = (e: React.MouseEvent<HTMLElement>) => {
+    const handleTimeSlotClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         const parentNode = e.currentTarget.parentNode as HTMLElement;
         const startTime = parentNode.dataset.itemStartTime;
         const endTime = parentNode.dataset.itemEndTime;

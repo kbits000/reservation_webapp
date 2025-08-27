@@ -1,5 +1,9 @@
 "use server";
-import { registerNewUser, getUsers } from "@/lib/_data_access/users";
+import {
+    registerNewUser,
+    getUsers,
+    getUserFullNameAndSexAndPhoneNumber
+} from "@/lib/_data_access/users";
 import { UserRegistrationSchema } from "@/lib/schemas/user_registration_schema";
 import { auth } from "@/auth";
 import { redirect } from 'next/navigation';
@@ -171,4 +175,18 @@ export async function getAllAvailableReservationsServerAction() {
   } catch {
     return null;
   }
+}
+
+export async function getUserFullNameAndSexAndPhoneNumberServerAction() {
+    const session = await auth();
+    if (!session) {
+        redirect('/api/auth/signin');
+    }
+
+    try {
+        const userData = await getUserFullNameAndSexAndPhoneNumber();
+        return userData;
+    } catch {
+        return null;
+    }
 }

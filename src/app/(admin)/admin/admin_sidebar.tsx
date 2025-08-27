@@ -24,7 +24,8 @@ export default function AdminSidebar() {
         { key: "reservations", icon: <CalendarOutlined />, label: <Link href="/admin/reservations">الحجوزات</Link> },
         { key: "customers", icon: <UserOutlined />, label: <Link href="/admin">العملاء</Link> },
         { key: "users_management", icon: <UserOutlined />, label: <Link href="/admin/users_management">المستخدمين</Link> },
-        {  type: "divider" },
+        { key: "my_details", icon: <UserOutlined />, label: <Link href="/admin/my_details">بياناتي</Link> },
+        { type: "divider" },
         { key: "sign out", icon: <PoweroffOutlined />, label: <Link href="/api/auth/signout">تسحيل الخروج</Link>, danger: true },
     ];
 

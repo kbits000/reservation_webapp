@@ -31,3 +31,12 @@ export async function getAllAvailableTimeSlotsForDateServerAction(dateInISO8601F
         return null;
     }
 }
+
+
+export async function makeReservationServerAction() {
+    try {
+
+    } catch {
+        return null;
+    }
+}
