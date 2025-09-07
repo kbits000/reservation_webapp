@@ -221,7 +221,7 @@ export async function getUserDataByEmail() {
 }
 
 interface UserFullNameAndSexAndPhoneNumberDTO {
-    full_name: string;
+    name: string;
     sex: string;
     phone_number: string;
 }
@@ -235,19 +235,22 @@ export async function getUserFullNameAndSexAndPhoneNumber() {
     try {
         await dbConnect();
 
-        const userData = await UsersModel.findOne({'email': session.user?.email}, 'name sex phone_number').lean();
+        const userData = await UsersModel.findOne({'email': session.user?.email})
+            .select('name sex phone_number -_id')
+            .lean<UserFullNameAndSexAndPhoneNumberDTO>();
+
         if (!userData) {
             return null;
         }
 
-        const userDataDTO: UserFullNameAndSexAndPhoneNumberDTO[] = [];
-        userDataDTO.push({
-            'full_name': userData!['name'],
-            'sex': userData!['sex'],
-            'phone_number': userData!['phone_number']
-        });
+        const userDataDTO = {
+            full_name: userData!.name as string,
+            sex: userData!.sex as string,
+            phone_number: userData!.phone_number as string
+        }
 
-        return userDataDTO[0];
+        // TODO WARNING potential data leakage. Mongodb might fetch other thing other than name, sex and phone_number
+        return userDataDTO;
     } catch {
         return null;
     }
