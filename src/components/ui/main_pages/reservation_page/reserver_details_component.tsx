@@ -1,11 +1,11 @@
 'use client'
 
+import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
 import { Button, Form, Input, Select, DatePicker, TimePicker } from 'antd';
 const {Option} = Select;
 const { Item } = Form;
 const { TextArea } = Input;
 const { RangePicker } = TimePicker;
-import type { GetRef, Carousel } from 'antd';
 import { ArrowRightOutlined }from '@ant-design/icons';
 import dayjs, {type Dayjs} from "dayjs";
 import 'dayjs/locale/ar-sa' // import locale
@@ -17,8 +17,6 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Riyadh");
 
 export function ReserverDetailsComponent(x: {
-    carouselRef: GetRef<typeof Carousel> | null;
-    toggleGoBackButtonClick: () => void;
     dateInH: Dayjs;
     userEmail: string | null | undefined;
     userName: string | null | undefined;
@@ -47,10 +45,7 @@ export function ReserverDetailsComponent(x: {
         <div dir='rtl'>
             <Button
                 onClick={() => {
-                    if (x.carouselRef) {
-                        x.carouselRef.prev();
-                        x.toggleGoBackButtonClick();
-                    }
+                    // redirectToReservingDetailsPageServerAction();
                 }}
                 icon={<ArrowRightOutlined/>}
                 className='mb-4'

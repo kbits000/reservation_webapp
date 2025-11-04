@@ -1,5 +1,7 @@
 'use server';
 
+import { auth } from "@/auth";
+import { redirect, RedirectType } from 'next/navigation';
 import { getAllAvailableTimeSlotsForDate } from '@/lib/_data_access/allowed_reservations';
 
 export async function getAvailableTimeSlotsForDate(dateInISO8601Format: string) {
@@ -39,4 +41,16 @@ export async function makeReservationServerAction() {
     } catch {
         return null;
     }
+}
+
+export async function redirectToReservingDetailsPageServerAction(selectedStartTime: string, selectedEndTime: string) {
+    try {
+        const session = await auth()
+        if (!session) {
+            redirect('/api/auth/signin');
+        }
+    } catch {
+        return null;
+    }
+    redirect('/reservation/reserving_details', RedirectType.push);
 }
