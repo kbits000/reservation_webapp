@@ -1,6 +1,6 @@
 'use client'
 
-import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
+// import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
 import { Button, Form, Input, Select, DatePicker, TimePicker } from 'antd';
 const {Option} = Select;
 const { Item } = Form;
@@ -17,10 +17,10 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Riyadh");
 
 export function ReserverDetailsComponent(x: {
-    dateInH: Dayjs;
+    // dateInH: Dayjs;
     userEmail: string | null | undefined;
     userName: string | null | undefined;
-    reservationDateInISO8601: Dayjs;
+    // reservationDateInISO8601: Dayjs;
     // reservationStartTimeInISO8601: Dayjs;
     // reservationEndTimeInISO8601: Dayjs;
     reservationTimePeriodInISO8601: [string, string];
@@ -42,7 +42,7 @@ export function ReserverDetailsComponent(x: {
     }
 
     return (
-        <div dir='rtl'>
+        <div dir='rtl' className='p-8'>
             <Button
                 onClick={() => {
                     // redirectToReservingDetailsPageServerAction();
@@ -58,7 +58,7 @@ export function ReserverDetailsComponent(x: {
                         full_name: x.userFullName,
                         email: x.userEmail,
                         gender: x.userSex,
-                        reservationDate: x.reservationDateInISO8601.tz('Asia/Riyadh'),
+                        reservationDate: dayjs(x.reservationTimePeriodInISO8601[0]).tz('Asia/Riyadh'),
                         reservationTimePeriod: [dayjs(x.reservationTimePeriodInISO8601[0]).tz('Asia/Riyadh'), dayjs(x.reservationTimePeriodInISO8601[1]).tz('Asia/Riyadh')]
                     }}
                 onFinish={onFinish}
@@ -85,7 +85,7 @@ export function ReserverDetailsComponent(x: {
                     label="رقم الهاتف"
                     rules={[{ required: true, message: 'الرجاء ادخال رقم الهاتف!' }]}
                 >
-                    <Input addonAfter={prefixSelector} style={{ width: '100%' }} disabled={true} required={true}/>
+                    <Input suffix={prefixSelector} style={{ width: '100%' }} disabled={true} required={true}/>
                 </Item>
                 <Item
                     name='gender'

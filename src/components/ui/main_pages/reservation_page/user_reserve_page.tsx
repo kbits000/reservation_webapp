@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
 import { useEffect, useState } from "react";
 import dayjs, {type Dayjs} from "dayjs";
@@ -35,6 +36,7 @@ export function UserReservePage(
         userFullName: string | null | undefined;
     }
 ) {
+    const router = useRouter()
     const screens = useBreakpoint();
     const [calenderValue, setCalenderValue] = useState<Dayjs>(dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).tz('Asia/Riyadh'));
     const [modalClickCounter, setModalClickCounter] = useState(0);
@@ -105,8 +107,10 @@ export function UserReservePage(
         setShowTimeSlotsPanel(false);
     }
 
-    const handleTimeSlotClick = (selectedStartTime: string, selectedEndTime: string) => {
-        setShowReserverDetails(prevState => !prevState);
+    const handleTimeSlotClick = async (selectedStartTime: string, selectedEndTime: string) => {
+        // TODO create a server action that
+        // router.push('/reservation/reserving_details');  // TODO with the datetimes !
+        const result = await redirectToReservingDetailsPageServerAction(selectedStartTime, selectedEndTime);
     }
 
     const toggleGoBackButtonClick = () => {
