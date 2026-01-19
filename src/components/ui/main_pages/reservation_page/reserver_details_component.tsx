@@ -1,7 +1,10 @@
 'use client'
 
+import React, { useState } from "react";
+import Link from 'next/link'
+import { submitReservationRequest } from '@/lib/actions/user_reservation_server_actions';
 // import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
-import { Button, Form, Input, Select, DatePicker, TimePicker } from 'antd';
+import { Button, Form, Input, Select, DatePicker, TimePicker, FormInstance, message } from 'antd';
 const {Option} = Select;
 const { Item } = Form;
 const { TextArea } = Input;
@@ -12,22 +15,49 @@ import 'dayjs/locale/ar-sa' // import locale
 dayjs.locale('ar-sa') // use locale
 import utc from 'dayjs/plugin/utc' // import utc plugin
 import timezone from 'dayjs/plugin/timezone'
+import { FieldTypesOfUserReservationForm } from "@/lib/schemas/types";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Riyadh");
 
+
+type SubmitButtonProps = {
+    form: FormInstance;
+    loading: boolean;
+}
+
+const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ form, loading, children }) => {
+    const [submittable, setSubmittable] = React.useState<boolean>(false);
+
+    // Watch all values
+    const values = Form.useWatch([], form);
+
+    React.useEffect(() => {
+        form
+            .validateFields({ validateOnly: true })
+            .then(() => setSubmittable(true))
+            .catch(() => setSubmittable(false));
+    }, [form, values]);
+
+    return (
+        <Button type="primary" htmlType="submit" loading={loading} disabled={!submittable}>
+            {children}
+        </Button>
+    );
+};
+
 export function ReserverDetailsComponent(x: {
-    // dateInH: Dayjs;
     userEmail: string | null | undefined;
     userName: string | null | undefined;
-    // reservationDateInISO8601: Dayjs;
-    // reservationStartTimeInISO8601: Dayjs;
-    // reservationEndTimeInISO8601: Dayjs;
     reservationTimePeriodInISO8601: [string, string];
     userPhoneNumber: string | null | undefined;
     userSex: string | null | undefined;
     userFullName: string | null | undefined;
 }) {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const prefixSelector = (
         <Item name="prefix" noStyle>
@@ -37,20 +67,48 @@ export function ReserverDetailsComponent(x: {
         </Item>
     );
 
-    const onFinish = () => {
-        console.log('onFinish');
+    const onFinish = async (values: FieldTypesOfUserReservationForm) => {
+        setLoading(true);
+
+        const formattedValues = {
+            ...values,
+            reservationDate: values.reservationDate.toISOString(),
+            reservationTimePeriod: [values.reservationTimePeriod[0].toISOString(), values.reservationTimePeriod[1].toISOString()],
+        };
+
+        try {
+            const response = await submitReservationRequest(formattedValues);
+            if (response) {
+                messageApi.open({
+                    type: 'success',
+                    content: 'تم الحجز بنجاح',
+                    duration: 10,
+                });
+            } else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'لم يتم الحجز !',
+                    duration: 10,
+                });
+            }
+        } catch {
+
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <div dir='rtl' className='p-8'>
-            <Button
-                onClick={() => {
-                    // redirectToReservingDetailsPageServerAction();
-                }}
-                icon={<ArrowRightOutlined/>}
-                className='mb-4'
-            >الرجوع للوراء</Button>
+            {contextHolder}
+            <Link href='/reservation' replace={true}>
+                <Button
+                    icon={<ArrowRightOutlined/>}
+                    className='mb-4'
+                >الرجوع للوراء</Button>
+            </Link>
             <Form
+                form={form}
                 initialValues={
                     {
                         username: x.userName,
@@ -108,15 +166,16 @@ export function ReserverDetailsComponent(x: {
                 >
                     <RangePicker disabled={true} format='h:mm a'/>
                 </Item>
-                <Item label={'سبب الحجز'} name='reservation-reason'  rules={[{ required: true, message: 'الرجاء ذكر سبب الحجز!' }]}>
+                <Item label={'سبب الحجز'} name={'reservation_reason'}  rules={[{ required: true, message: 'الرجاء ذكر سبب الحجز!' }]}>
                     <TextArea showCount={true} required={true}/>
                 </Item>
-                <Item label='ملاحظات اضافية'>
+                <Item label='ملاحظات اضافية' name={'additional_information'}>
                     <TextArea showCount={true}/>
                 </Item>
-                <Button type="primary" htmlType="submit">
-                    Submit
-                </Button>
+                {/*<Button type="primary" htmlType="submit">*/}
+                {/*    Submit*/}
+                {/*</Button>*/}
+                <SubmitButton form={form} loading={loading}>Submit</SubmitButton>
             </Form>
         </div>
     )

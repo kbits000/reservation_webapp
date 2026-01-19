@@ -3,13 +3,19 @@ import { auth } from "@/auth";
 import { redirect } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import ReservationsModel from '@/lib/database_models/reservations_model';
+import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
 
-
-export async function addReservations() {
-    const session = await auth()
+export async function addReservation(formData: formattedFieldTypesOfUserReservationForm) {
+    const session = await auth();
     if (!session) {
-    // redirect('/api/auth/signin?callbackUrl=/user');
-    redirect('/api/auth/signin');
+        redirect('/api/auth/signin');
+    }
+
+    try {
+        await dbConnect();
+
+    } catch {
+        return null;
     }
 }
 

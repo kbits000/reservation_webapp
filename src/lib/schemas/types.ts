@@ -1,3 +1,5 @@
+import type {Dayjs} from "dayjs";
+
 export type StartReservationDateTime = {
     startDateYear: string;
     startDateMonth: string;
@@ -13,3 +15,25 @@ export type EndReservationDateTime = {
     endDateHour: string;
     endDateMinutes: string;
 };
+
+export type FieldTypesOfUserReservationForm = {
+    username: string;
+    full_name: string;
+    email: string;
+    phone_number: string;
+    gender: string;
+    reservationDate: Dayjs;
+    reservationTimePeriod: Dayjs[];
+    reservation_reason?: string;
+}
+
+export type formattedFieldTypesOfUserReservationForm = {
+    username: string;
+    full_name: string;
+    email: string;
+    phone_number: string;
+    gender: string;
+    reservationDate: string;
+    reservationTimePeriod: string[];
+    reservation_reason?: string;
+}

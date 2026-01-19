@@ -3,6 +3,8 @@
 import { auth } from "@/auth";
 import { redirect } from 'next/navigation';
 import { getAllAvailableTimeSlotsForDate } from '@/lib/_data_access/allowed_reservations';
+import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
+import { addReservation } from "@/lib/_data_access/reservations";
 
 export async function getAvailableTimeSlotsForDate(dateInISO8601Format: string) {
     try {
@@ -58,4 +60,24 @@ export async function redirectToReservingDetailsPageServerAction(selectedStartTi
         endTime: selectedEndTime,
     });
     redirect(`/reservation/reserving_details?${params.toString()}`);
+}
+
+export async function submitReservationRequest(formData: formattedFieldTypesOfUserReservationForm) {
+    const session = await auth();
+    if (!session) {
+        redirect('/api/auth/signin');
+    }
+
+    try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const result = await addReservation(formData);
+
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    } finally {
+
+    }
 }
