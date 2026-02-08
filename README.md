@@ -7,7 +7,8 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-6.13-green)
 
 ## Overview
-This is a [Next.js](https://nextjs.org) web application originally developed for a center that provides educational courses and the ability to reserve a room for general purpose. All copyright contents have been removed.
+A full-stack web application built with [Next.js](https://nextjs.org) for reserving timeslots. Features Google OAuth authentication, role-based access control, and a comprehensive admin dashboard.
+
 
 **Language:** Arabic (RTL support) | **Timezone:** Asia/Riyadh
 
