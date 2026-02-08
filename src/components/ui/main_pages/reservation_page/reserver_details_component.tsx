@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { submitReservationRequest } from '@/lib/actions/user_reservation_server_actions';
 // import { redirectToReservingDetailsPageServerAction } from '@/lib/actions/user_reservation_server_actions';
 import { Button, Form, Input, Select, DatePicker, TimePicker, FormInstance, message } from 'antd';
@@ -55,6 +56,7 @@ export function ReserverDetailsComponent(x: {
     userSex: string | null | undefined;
     userFullName: string | null | undefined;
 }) {
+    const router = useRouter()
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
@@ -84,10 +86,17 @@ export function ReserverDetailsComponent(x: {
                     content: 'تم الحجز بنجاح',
                     duration: 10,
                 });
-            } else {
+                router.replace('/reservation');
+            } else if (response===false) {
                 messageApi.open({
                     type: 'error',
                     content: 'لم يتم الحجز !',
+                    duration: 10,
+                });
+            } else {
+                messageApi.open({
+                    type: 'error',
+                    content: 'لم يتم الحجز ! حدثت مشكلة ما',
                     duration: 10,
                 });
             }

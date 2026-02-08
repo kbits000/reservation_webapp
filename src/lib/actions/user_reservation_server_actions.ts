@@ -69,15 +69,10 @@ export async function submitReservationRequest(formData: formattedFieldTypesOfUs
     }
 
     try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
         const result = await addReservation(formData);
 
-        return true;
-    } catch (error) {
-        console.log(error);
-        return false;
-    } finally {
-
+        return result === true;
+    } catch {
+        return null;
     }
 }
