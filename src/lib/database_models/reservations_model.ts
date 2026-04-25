@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-
+import {v4 as uuidv4} from 'uuid';
 
 const ReservationConfirmationInformation = new Schema ({
     confirmed_by: {type: Schema.Types.ObjectId, ref: "users"},
@@ -9,6 +9,12 @@ const ReservationConfirmationInformation = new Schema ({
 
 const ReservationsSchema = new Schema(
     {
+        public_id: {
+            type: Schema.Types.UUID,
+            default: uuidv4,
+            unique: true,
+            index: true
+        },
         customer: {type: Schema.Types.ObjectId, ref: "user", required: true},
         date: {type: Date, required: true},
         start_time: {type: Date, required: true},

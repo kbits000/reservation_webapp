@@ -1,10 +1,15 @@
 'use server';
 
 import { auth } from "@/auth";
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getAllAvailableTimeSlotsForDate } from '@/lib/_data_access/allowed_reservations';
 import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
-import { addReservation } from "@/lib/_data_access/reservations";
+import {
+    addReservation,
+    cancelCurrentUserReservation,
+    getCurrentUserReservations
+} from "@/lib/_data_access/reservations";
 
 export async function getAvailableTimeSlotsForDate(dateInISO8601Format: string) {
     try {
@@ -35,7 +40,6 @@ export async function getAllAvailableTimeSlotsForDateServerAction(dateInISO8601F
         return null;
     }
 }
-
 
 export async function makeReservationServerAction() {
     try {
@@ -72,6 +76,42 @@ export async function submitReservationRequest(formData: formattedFieldTypesOfUs
         const result = await addReservation(formData);
 
         return result === true;
+    } catch {
+        return null;
+    }
+}
+
+export async function getCurrentUserReservationsServerAction() {
+    const session = await auth();
+    if (!session) {
+        redirect('/api/auth/signin');
+    }
+
+    try {
+        return await getCurrentUserReservations();
+    } catch {
+        return null;
+    }
+}
+
+export async function cancelCurrentUserReservationServerAction(reservationPublicId: string) {
+    const session = await auth();
+    if (!session) {
+        redirect('/api/auth/signin');
+    }
+
+    if (!reservationPublicId) {
+        return null;
+    }
+
+    try {
+        const result = await cancelCurrentUserReservation(reservationPublicId);
+
+        if (result) {
+            revalidatePath('/user/reservations');
+        }
+
+        return result;
     } catch {
         return null;
     }

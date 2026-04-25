@@ -65,9 +65,15 @@ export default function NavbarSignedIn({ userRole }: { userRole: string; }) {
         },
         {
           label: (
+            <Link href='/user/reservations'>حجوزاتي</Link>
+          ),
+          key: '2'
+        },
+        {
+          label: (
               <Link href="/api/auth/signout">تسجيل الخروج</Link>
           ),
-          key: '2',
+          key: '3',
         }
     )
   } else {
@@ -86,9 +92,15 @@ export default function NavbarSignedIn({ userRole }: { userRole: string; }) {
         },
         {
           label: (
+            <Link href='/user/reservations'>حجوزاتي</Link>
+          ),
+          key: '2'
+        },
+        {
+          label: (
               <Link href="/api/auth/signout">تسجيل الخروج</Link>
           ),
-          key: '2',
+          key: '3',
         }
     )
   }

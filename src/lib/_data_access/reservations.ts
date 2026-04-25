@@ -8,6 +8,18 @@ import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
 import UsersModel from "@/lib/database_models/users_model";
 import mongoose, { ClientSession } from 'mongoose';
 
+// export type ReservationStatus = 'pending' | 'rejected' | 'cancelled' | 'confirmed';
+
+// export interface CurrentUserReservationDTO {
+//     id: string;
+//     key: string;
+//     date: string;
+//     start_time: string;
+//     end_time: string;
+//     reason: string;
+//     status: ReservationStatus;
+//     created_at: string;
+// }
 
 export async function addReservation(formData: formattedFieldTypesOfUserReservationForm) {
     const authSession = await auth();
@@ -159,6 +171,102 @@ export async function getPendingOrConfirmedReservationsForSpecificDate(dateInISO
         const pendingOrConfirmedReservationsDTOList = pendingReservationsDTOList.concat(confirmedReservationsDTOList);
 
         return pendingOrConfirmedReservationsDTOList;
+    } catch {
+        return null;
+    }
+}
+
+export async function getCurrentUserReservations() {
+    const authSession = await auth();
+    if (!authSession) {
+        redirect('/api/auth/signin');
+    }
+
+    if (!authSession.user?.email) {
+        return null;
+    }
+
+    try {
+        await dbConnect();
+
+        const user = await UsersModel.findOne(
+            { email: authSession.user.email },
+            '_id'
+        ).lean() as { _id: mongoose.Types.ObjectId } | null;
+
+        if (!user) {
+            return null;
+        }
+
+        // const reservations = await ReservationsModel.find(
+        //     { customer: user._id },
+        //     'date start_time end_time reason status createdAt'
+        // ).sort({ createdAt: -1, date: -1 }).lean() as Array<{
+        //     _id: mongoose.Types.ObjectId;
+        //     date: Date;
+        //     start_time: Date;
+        //     end_time: Date;
+        //     reason: string;
+        //     status: ReservationStatus;
+        //     createdAt?: Date;
+        // }>;
+
+        const reservations = await ReservationsModel.find(
+            { customer: user._id },
+            'public_id date start_time end_time reason status createdAt'
+        ).sort({ createdAt: -1, date: -1 }).lean();
+
+        return reservations.map((reservation) => ({
+            public_id: (reservation.public_id).toString(),
+            key: (reservation.public_id).toString(),
+            date: reservation.date.toISOString(),
+            start_time: reservation.start_time.toISOString(),
+            end_time: reservation.end_time.toISOString(),
+            reason: reservation.reason,
+            status: reservation.status,
+            created_at: (reservation.createdAt ?? reservation.date).toISOString(),
+        }));
+    } catch {
+        return null;
+    }
+}
+
+export async function cancelCurrentUserReservation(reservationId: string): Promise<boolean | null> {
+    const authSession = await auth();
+    if (!authSession) {
+        redirect('/api/auth/signin');
+    }
+
+    if (!authSession.user?.email || !mongoose.Types.ObjectId.isValid(reservationId)) {
+        return null;
+    }
+
+    try {
+        await dbConnect();
+
+        const user = await UsersModel.findOne(
+            { email: authSession.user.email },
+            '_id'
+        ).lean() as { _id: mongoose.Types.ObjectId } | null;
+
+        if (!user) {
+            return null;
+        }
+
+        const updateResult = await ReservationsModel.updateOne(
+            {
+                _id: reservationId,
+                customer: user._id,
+                status: { $in: ['pending', 'confirmed'] }
+            },
+            {
+                $set: {
+                    status: 'cancelled'
+                }
+            }
+        );
+
+        return updateResult.modifiedCount === 1;
     } catch {
         return null;
     }
