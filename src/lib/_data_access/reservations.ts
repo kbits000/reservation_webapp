@@ -7,6 +7,8 @@ import DisallowedReservationsDatesModel from '@/lib/database_models/disallowed_r
 import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
 import UsersModel from "@/lib/database_models/users_model";
 import mongoose, { ClientSession } from 'mongoose';
+// import { v4 as uuidv4 } from "uuid";
+import { validate as uuidValidate } from "uuid";
 
 // export type ReservationStatus = 'pending' | 'rejected' | 'cancelled' | 'confirmed';
 
@@ -217,8 +219,8 @@ export async function getCurrentUserReservations() {
         ).sort({ createdAt: -1, date: -1 }).lean();
 
         return reservations.map((reservation) => ({
-            public_id: (reservation.public_id).toString(),
-            key: (reservation.public_id).toString(),
+            public_id: (reservation.public_id ?? reservation._id).toString(),
+            key: (reservation.public_id ?? reservation._id).toString(),
             date: reservation.date.toISOString(),
             start_time: reservation.start_time.toISOString(),
             end_time: reservation.end_time.toISOString(),
@@ -231,19 +233,23 @@ export async function getCurrentUserReservations() {
     }
 }
 
-export async function cancelCurrentUserReservation(reservationId: string): Promise<boolean | null> {
+export async function cancelCurrentUserReservation(reservationPublicId: string): Promise<boolean | null> {
     const authSession = await auth();
+
     if (!authSession) {
         redirect('/api/auth/signin');
     }
 
-    if (!authSession.user?.email || !mongoose.Types.ObjectId.isValid(reservationId)) {
+    // if (!authSession.user?.email || !mongoose.Types.ObjectId.isValid(reservationPublicId)) {
+    //     return null;
+    // }
+
+    if (!authSession.user?.email || !uuidValidate(reservationPublicId)) {
         return null;
     }
 
     try {
         await dbConnect();
-
         const user = await UsersModel.findOne(
             { email: authSession.user.email },
             '_id'
@@ -255,7 +261,7 @@ export async function cancelCurrentUserReservation(reservationId: string): Promi
 
         const updateResult = await ReservationsModel.updateOne(
             {
-                _id: reservationId,
+                public_id: reservationPublicId,
                 customer: user._id,
                 status: { $in: ['pending', 'confirmed'] }
             },
