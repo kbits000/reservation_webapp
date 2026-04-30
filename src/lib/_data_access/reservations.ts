@@ -3,10 +3,11 @@ import { auth } from "@/auth";
 import { redirect } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import ReservationsModel from '@/lib/database_models/reservations_model';
+import UsersModel from "@/lib/database_models/users_model";
 import DisallowedReservationsDatesModel from '@/lib/database_models/disallowed_reservations_dates_model';
 import { formattedFieldTypesOfUserReservationForm } from "@/lib/schemas/types";
-import UsersModel from "@/lib/database_models/users_model";
 import mongoose, { ClientSession } from 'mongoose';
+import { getUserRoleByEmail } from "@/lib/_data_access/users";
 // import { v4 as uuidv4 } from "uuid";
 import { validate as uuidValidate } from "uuid";
 
@@ -291,5 +292,125 @@ export async function deleteReservations() {
     if (!session) {
     // redirect('/api/auth/signin?callbackUrl=/user');
     redirect('/api/auth/signin');
+    }
+}
+
+export type AdminReservationRequestStatus = 'pending' | 'rejected' | 'cancelled' | 'confirmed';
+
+// export interface AdminReservationRequestDTO {
+//     public_id: string;
+//     key: string;
+//     date: string;
+//     start_time: string;
+//     end_time: string;
+//     reason: string;
+//     status: AdminReservationRequestStatus;
+//     created_at: string;
+//     customer_name: string;
+//     customer_email: string;
+//     customer_phone_number: string;
+// }
+
+async function assertAdminSession() {
+    const authSession = await auth();
+    if (!authSession) {
+        redirect('/api/auth/signin');
+    }
+
+    const userRole = await getUserRoleByEmail(authSession.user?.email);
+    if (userRole !== 'admin') {
+        redirect('/');
+    }
+}
+
+export async function getAdminReservationRequests() {
+    await assertAdminSession();
+  
+    try {
+        await dbConnect();
+        // TODO solve populating customer info problem
+        const reservations = await ReservationsModel.find(
+            {},
+            'public_id date start_time end_time reason status createdAt customer'
+        )
+            .sort({ createdAt: -1, date: -1 })
+            .lean().exec();
+            // .populate<{ customer: { name?: string; email?: string; phone_number?: string } }>('customer', 'name email phone_number')
+
+
+        // console.log('reservations BEFORE: ' )
+        // console.log(reservations[1].customer)
+        // console.log('reservations AFTER: ' )
+
+        return reservations.map((reservation) => ({
+            public_id: String(reservation.public_id ?? reservation._id),
+            key: String(reservation.public_id ?? reservation._id),
+            date: reservation.date.toISOString(),
+            start_time: reservation.start_time.toISOString(),
+            end_time: reservation.end_time.toISOString(),
+            reason: reservation.reason ?? '',
+            status: reservation.status as AdminReservationRequestStatus,
+            created_at: (reservation.createdAt ?? reservation.date).toISOString(),
+            customer_name: reservation.customer?.name ?? '-',
+            customer_email: reservation.customer?.email ?? '-',
+            customer_phone_number: reservation.customer?.phone_number ?? '-',
+        }));
+    } catch {
+        // console.error("DEBUG ERROR:", error);
+        return null;
+    }
+}
+
+export async function confirmReservationRequestByAdmin(reservationPublicId: string) {
+    await assertAdminSession();
+
+    if (!reservationPublicId || !uuidValidate(reservationPublicId)) {
+        return null;
+    }
+
+    try {
+        await dbConnect();
+
+        const reservation = await ReservationsModel.findOne({
+            public_id: reservationPublicId,
+            status: 'pending',
+        });
+
+        if (!reservation) {
+            return false;
+        }
+
+        reservation.status = 'confirmed';
+        const savedDoc = await reservation.save();
+        return savedDoc===reservation;
+    } catch {
+        return null;
+    }
+}
+
+export async function rejectReservationRequestByAdmin(reservationPublicId: string) {
+    await assertAdminSession();
+
+    if (!reservationPublicId || !uuidValidate(reservationPublicId)) {
+        return null;
+    }
+
+    try {
+        await dbConnect();
+
+        const reservation = await ReservationsModel.findOne({
+            public_id: reservationPublicId,
+            status: 'pending',
+        });
+
+        if (!reservation) {
+            return false;
+        }
+
+        reservation.status = 'rejected';
+        const savedDoc = await reservation.save();
+        return savedDoc===reservation;
+    } catch {
+        return null;
     }
 }
